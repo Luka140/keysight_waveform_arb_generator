@@ -56,7 +56,7 @@ plt.show()
 #82
 #124
 
-max_val_16bit_int   = 32767
+max_val_16bit_int   = 32767    # A 16 bit signed int is used (range -32767 to 32767) to represent the unit waveform
 scaled_voltage_float = max_val_16bit_int * unit_windowed_signal / (np.max(np.abs(unit_windowed_signal)))
 scaled_voltage_float[scaled_voltage_float >= 0] = np.floor(scaled_voltage_float[scaled_voltage_float >= 0])
 scaled_voltage_float[scaled_voltage_float < 0] = np.ceil(scaled_voltage_float[scaled_voltage_float < 0])

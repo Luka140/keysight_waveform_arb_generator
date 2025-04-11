@@ -23,7 +23,7 @@ def generate_arb_file(path, series, high_level, low_level, sample_rate):
     #82
     #124
     
-    max_val_16bit_int   = 32767
+    max_val_16bit_int   = 32767    # A 16 bit signed int is used (range -32767 to 32767) to represent the unit waveform
     scaled_voltage_float = max_val_16bit_int * series / (np.max(np.abs(series)))
     scaled_voltage_float[scaled_voltage_float >= 0] = np.floor(scaled_voltage_float[scaled_voltage_float >= 0])
     scaled_voltage_float[scaled_voltage_float < 0] = np.ceil(scaled_voltage_float[scaled_voltage_float < 0])

@@ -8,7 +8,7 @@ import os
 
 
 
-def generate_arb_file(path, series, high_level, low_level, sample_rate):
+def generate_arb_file(directory, filename, series, high_level, low_level, sample_rate):
     # ----- Format: 
     #File Format:1.10
     #Channel Count:1
@@ -22,13 +22,20 @@ def generate_arb_file(path, series, high_level, low_level, sample_rate):
     #41
     #82
     #124
-    
+
     max_val_16bit_int   = 32767    # A 16 bit signed int is used (range -32767 to 32767) to represent the unit waveform
     scaled_voltage_float = max_val_16bit_int * series / (np.max(np.abs(series)))
     scaled_voltage_float[scaled_voltage_float >= 0] = np.floor(scaled_voltage_float[scaled_voltage_float >= 0])
     scaled_voltage_float[scaled_voltage_float < 0] = np.ceil(scaled_voltage_float[scaled_voltage_float < 0])
     scaled_voltage = scaled_voltage_float.astype(int)
     
+    if not directory.exists():
+        os.mkdir(filepath)
+    
+    path = directory / filename
+    
+    if path.suffix != ".arb":
+        path = path.with_suffix(".arb")
     if not path.exists():
         path.touch()
     
@@ -48,22 +55,23 @@ def generate_arb_file(path, series, high_level, low_level, sample_rate):
     print(f"Waveform saved at: {path}")
     return path 
 
+
+
 if __name__=='__main__':
     _current_time = str(datetime.now().time()).replace(".", "-").replace(":", "_") # No periods in filename
     
     
     # ----------- SETTINGS -------------------------------------------------------
     frequency               = 30e3               # Hz
-    nr_cycles               = 1 
+    nr_cycles               = 3 
     sample_rate             = 250 * 10**6  
     peak_to_peak_voltage    = 6                  # Volts
     
     filename                = f"waveform{int(frequency)}Hz_{int(nr_cycles)}cycles_{int(peak_to_peak_voltage)}Vpp_{_current_time}.arb"
     filepath                = pathlib.Path.cwd() / "signals" 
     # ----------------------------------------------------------------------------
-    if not filepath.exists():
-        os.mkdir(filepath)
-    
+
+
     t_end = nr_cycles / frequency
     time = np.linspace(0, t_end, int(t_end * sample_rate))
     unit_voltage = np.sin(2 * np.pi * frequency * time)
@@ -85,6 +93,4 @@ if __name__=='__main__':
     plt.show()
     
     # Save to csv:
-    path = filepath / filename
-        
-    generate_arb_file(path, unit_windowed_signal, high_level=3, low_level=-3, sample_rate=sample_rate)
+    generate_arb_file(filepath, filename, unit_windowed_signal, high_level=3, low_level=-3, sample_rate=sample_rate)
